@@ -1,0 +1,54 @@
+mysql> CREATE DATABASE IF NOT EXISTS db1;
+Query OK, 1 row affected, 1 warning (0.00 sec)
+
+root@38f05cc8364a:/# mysql -u root -p db1 < db1.sql
+Enter password:
+
+mysql> use db1
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+
+mysql> SELECT * FROM Authors;
++----+-----------+------------+-------------+
+| Id | FirstName | SecondName | Books_Count |
++----+-----------+------------+-------------+
+|  1 | Arthur    | Clarke     |          21 |
+|  2 | Richard   | Clarke     |          10 |
+|  3 | Susanna   | Clarke     |           2 |
+|  4 | Arthur    | Doyle      |          33 |
++----+-----------+------------+-------------+
+4 rows in set (0.00 sec)
+
+<Changes to config + restart of s1>
+
+mysql>  CHANGE MASTER TO MASTER_HOST='10.5.0.4',MASTER_USER='slave',MASTER_PASSWORD='password',MASTER_LOG_FILE = 'mysql-bin.000003',MASTER_LOG_POS=1,GET_MASTER_PUBLIC_KEY=1;
+Query OK, 0 rows affected, 8 warnings (0.05 sec)
+
+mysql> START SLAVE;
+Query OK, 0 rows affected, 1 warning (0.01 sec)
+
+mysql> SHOW SLAVE STATUS;
+...  Read_Master_Log_Pos | Relay_Log_File         | Relay_Log_Pos | Relay_Master_Log_File | Slave_IO_Running | Slave_SQL_Running...
+...                  869 | mysql-relay-bin.000002 |          1084 | mysql-bin.000003      | Yes              | Yes
+
+
+On Master:
+
+mysql> INSERT into Authors (FirstName, SecondName, Books_Count) SELECT 'Jack', 'London', 50 UNION ALL SELECT 'Isaac', 'Asimov', 70;
+Query OK, 2 rows affected (0.01 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select * from Authors;
++----+-----------+------------+-------------+
+| Id | FirstName | SecondName | Books_Count |
++----+-----------+------------+-------------+
+|  1 | Arthur    | Clarke     |          21 |
+|  2 | Richard   | Clarke     |          10 |
+|  3 | Susanna   | Clarke     |           2 |
+|  4 | Arthur    | Doyle      |          33 |
+|  5 | Jack      | London     |          50 |
+|  6 | Isaac     | Asimov     |          70 |
++----+-----------+------------+-------------+
+6 rows in set (0.00 sec)

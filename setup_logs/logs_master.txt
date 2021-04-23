@@ -1,0 +1,51 @@
+mysql> use db1;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> select * from Authors;
++----+-----------+------------+-------------+
+| Id | FirstName | SecondName | Books_Count |
++----+-----------+------------+-------------+
+|  1 | Arthur    | Clarke     |          21 |
+|  2 | Richard   | Clarke     |          10 |
+|  3 | Susanna   | Clarke     |           2 |
+|  4 | Arthur    | Doyle      |          33 |
++----+-----------+------------+-------------+
+4 rows in set (0.00 sec)
+
+mysql> CREATE USER 'slave'@'%' IDENTIFIED BY 'password';
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> use db1; GRANT REPLICATION SLAVE ON *.* TO 'slave'@'%';
+Database changed
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> USE db1; FLUSH TABLES WITH READ LOCK;
+Database changed
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SHOW MASTER STATUS;
++------------------+----------+--------------+------------------+-------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++------------------+----------+--------------+------------------+-------------------+
+| mysql-bin.000003 |      866 | db1          |                  |                   |
++------------------+----------+--------------+------------------+-------------------+
+1 row in set (0.00 sec)
+
+mysql> USE db1; FLUSH TABLES WITH READ LOCK;
+Database changed
+Query OK, 0 rows affected (0.00 sec)
+
+root@10abedaf05b6:/# mysqldump -u root -p db1 > db1.sql
+Enter password:
+
+mysql> use db1; UNLOCK TABLES;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+Query OK, 0 rows affected (0.00 sec)

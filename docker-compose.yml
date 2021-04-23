@@ -1,0 +1,55 @@
+version: '3.4'
+
+networks:    
+    net:
+      driver: bridge
+      ipam:
+         config:
+            - subnet: 10.5.0.0/16
+
+services:   
+
+  master:
+    image: mysql:8
+    container_name: master
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_psw1
+      MYSQL_DATABASE: db1
+      MYSQL_USER: user1
+      MYSQL_PASSWORD: psw1
+    volumes:
+      - ./configs/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./configs/master.cnf:/etc/mysql/conf.d/master.cnf
+    networks:
+         net:
+           ipv4_address: 10.5.0.4
+
+  s1:
+    image: mysql:8
+    container_name: s1   
+    environment:
+      MYSQL_ROOT_PASSWORD: root_psw1
+      MYSQL_DATABASE: db1
+      MYSQL_USER: user1
+      MYSQL_PASSWORD: psw1
+    volumes:
+      - ./configs/s1.cnf:/etc/mysql/conf.d/custom.cnf
+    networks:
+         net:
+           ipv4_address: 10.5.0.5
+
+  s2:
+    image: mysql:8
+    container_name: s2   
+    environment:
+      MYSQL_ROOT_PASSWORD: root_psw1
+      MYSQL_DATABASE: db1
+      MYSQL_USER: user1
+      MYSQL_PASSWORD: psw1
+    volumes:
+      - ./configs/s2.cnf:/etc/mysql/conf.d/custom.cnf
+    networks:
+         net:
+           ipv4_address: 10.5.0.6

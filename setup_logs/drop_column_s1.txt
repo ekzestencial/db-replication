@@ -1,0 +1,25 @@
+Slave1:
+
+mysql> ALTER TABLE Authors DROP COLUMN SecondName;
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+| Slave_IO_State                   | Master_Host | Master_User | Master_Port | Connect_Retry | Master_Log_File  | Read_Master_Log_Pos | Relay_Log_File         | Relay_Log_Pos | Relay_Master_Log_File | Slave_IO_Running | Slave_SQL_Running |
+| Waiting for master to send event | 10.5.0.4    | slave       |        3306 |            60 | mysql-bin.000003 |                1531 | mysql-relay-bin.000002 |          1412 | mysql-bin.000003      | Yes              | No
+
+
+mysql> CHANGE MASTER TO MASTER_HOST='10.5.0.4',MASTER_USER='slave',MASTER_PASSWORD='password',MASTER_LOG_FILE = 'mysql-bin.000003',MASTER_LOG_POS=1,GET_MASTER_PUBLIC_KEY=1;
+ERROR 3021 (HY000): This operation cannot be performed with a running slave io thread; run STOP SLAVE IO_THREAD FOR CHANNEL '' first.
+
+mysql> select * from Authors;
++----+-----------+-------------+
+| Id | FirstName | Books_Count |
++----+-----------+-------------+
+|  1 | Arthur    |          21 |
+|  2 | Richard   |          10 |
+|  3 | Susanna   |           2 |
+|  4 | Arthur    |          33 |
+|  5 | Jack      |          50 |
+|  6 | Isaac     |          70 |
++----+-----------+-------------+
+6 rows in set (0.00 sec)

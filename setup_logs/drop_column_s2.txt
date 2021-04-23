@@ -1,0 +1,46 @@
+Slave 2:
+
+mysql> ALTER TABLE Authors DROP COLUMN Books_Count;
+Query OK, 0 rows affected (0.08 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> SHOW SLAVE STATUS;
+Empty set, 1 warning (0.00 sec)
+
+mysql> START SLAVE;
+ERROR 1200 (HY000): The server is not configured as slave; fix in config file or with CHANGE MASTER TO
+
+
+mysql> CHANGE MASTER TO MASTER_HOST='10.5.0.4',MASTER_USER='slave',MASTER_PASSWORD='password',MASTER_LOG_FILE = 'mysql-bin.000003',MASTER_LOG_POS=1,GET_MASTER_PUBLIC_KEY=1;
+Query OK, 0 rows affected, 9 warnings (0.04 sec)
+
+mysql> START SLAVE;
+Query OK, 0 rows affected, 1 warning (0.01 sec)
+
+master:
+mysql> INSERT into Authors (FirstName, SecondName, Books_Count) SELECT 'Jack2', 'London2', 100 UNION ALL SELECT 'Isaac2', 'Asimov2', 140;
+Query OK, 2 rows affected (0.00 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> INSERT into Authors (FirstName, SecondName, Books_Count) SELECT 'Jack3', 'London3', 150 UNION ALL SELECT 'Isaac3', 'Asimov3', 210;
+Query OK, 2 rows affected (0.00 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+slave2:
+
+mysql> select * from Authors;
++----+-----------+------------+
+| Id | FirstName | SecondName |
++----+-----------+------------+
+|  1 | Arthur    | Clarke     |
+|  2 | Richard   | Clarke     |
+|  3 | Susanna   | Clarke     |
+|  4 | Arthur    | Doyle      |
+|  5 | Jack      | London     |
+|  6 | Isaac     | Asimov     |
+|  8 | Jack2     | London2    |
+|  9 | Isaac2    | Asimov2    |
+| 11 | Jack3     | London3    |
+| 12 | Isaac3    | Asimov3    |
++----+-----------+------------+
+10 rows in set (0.00 sec)

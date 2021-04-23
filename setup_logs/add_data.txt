@@ -1,0 +1,41 @@
+INSERT 1000 rows in a loop on Master.
+While executing, read data on slave s1:
+
+mysql> select count(*) from Authors;
++----------+
+| count(*) |
++----------+
+|      630 |
++----------+
+1 row in set (0.01 sec)
+
+mysql> select count(*) from Authors;
++----------+
+| count(*) |
++----------+
+|     1006 |
++----------+
+1 row in set (0.00 sec)
+
+
+​F:\Github\Highload-software-architecture\L18-DB-replicationPS>docker stop s1
+s1
+​F:\Github\Highload-software-architecture\L18-DB-replicationPS>docker container ls
+CONTAINER ID   IMAGE     COMMAND                  CREATED       STATUS       PORTS                               NAMES
+5c1e5cdedd19   mysql:8   "docker-entrypoint.s…"   2 hours ago   Up 2 hours   0.0.0.0:3306->3306/tcp, 33060/tcp   master
+1fee9de5d5ef   mysql:8   "docker-entrypoint.s…"   2 hours ago   Up 2 hours   3306/tcp, 33060/tcp                 s2
+
+DELETE
+FROM Authors
+WHERE Id > 6;
+
+s2:
+
+mysql> select count(*) from Authors;
++----------+
+| count(*) |
++----------+
+|        6 |
++----------+
+1 row in set (0.00 sec)
+
